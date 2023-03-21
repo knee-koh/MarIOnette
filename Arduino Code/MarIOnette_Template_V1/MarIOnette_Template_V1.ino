@@ -11,23 +11,18 @@ FTM2	25, 32	                        @488.28 Hz
 
 #include "config.h"
 #include <Arduino.h>
-
-#if STEPPERS > 0
-  #include <TMCStepper.h>
-  #include <AccelStepper.h>
-#endif
-
+#include <AccelStepper.h>
 #include <Servo.h>
+#include <Adafruit_NeoPixel.h>
 
 //#include <PWMServo.h>
 #if TOTAL_LEDS > 0
-  #include <Adafruit_NeoPixel.h>
   #include "PWMServo.h"
 #else
   #include <Servo.h>
 #endif
 
-IntervalTimer myTimer;
+//IntervalTimer myTimer;
 
 //ESP32Encoder encoder;
 
@@ -52,7 +47,6 @@ IntervalTimer myTimer;
 // 80 steps per mm for 16 microsteps, 160 for 32, 320 for 64, 640 for 128, 1280 for 256ss
 
 // Stepper Driver Initialization
-TMC2130Stepper driver(CS_PIN, R_SENSE);
 AccelStepper stepper = AccelStepper(stepper.DRIVER, STEP_PIN, DIR_PIN);
 
 uint32_t steps_per_mm = 1280;
