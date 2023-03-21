@@ -11,12 +11,17 @@ FTM2	25, 32	                        @488.28 Hz
 
 #include "config.h"
 #include <Arduino.h>
-#include <TMCStepper.h>
-#include <AccelStepper.h>
+
+#if STEPPERS > 0
+  #include <TMCStepper.h>
+  #include <AccelStepper.h>
+#endif
+
 #include <Servo.h>
-#include <Adafruit_NeoPixel.h>
+
 //#include <PWMServo.h>
 #if TOTAL_LEDS > 0
+  #include <Adafruit_NeoPixel.h>
   #include "PWMServo.h"
 #else
   #include <Servo.h>
