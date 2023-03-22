@@ -15,6 +15,13 @@ FTM2	25, 32	                        @488.28 Hz
 #include <Servo.h>
 #include <Adafruit_NeoPixel.h>
 
+
+#if defined(__AVR__)
+  #define PARSE_INT 1
+#else
+  #define PARSE_INT 0
+#endif
+
 //#include <PWMServo.h>
 #if TOTAL_LEDS > 0
   #include "PWMServo.h"
@@ -102,9 +109,17 @@ void readSerialBytes(){
 		if(mode == 'A'){
 			counter = 0;
 
+      if(PARSE_INT){
+        delay(1);
+      }
+
 			// Read in first bytes to get message length
 			char one = Serial.read();
-      delay(1);
+      
+      if(PARSE_INT){
+        delay(1);
+      }
+
 			char two = Serial.read();
 			howManyBytes = word(one, two) + expectedSpeedBytes;
 			
@@ -116,19 +131,15 @@ void readSerialBytes(){
 			char tempBuffer[howManyBytes];
 
 			while(Serial.available()){
+        if(PARSE_INT){
+          delay(1);
+        }
+
 				inByte = Serial.read();
-        delay(1);
 				
 				// Keep reading in case last byte is the stop char
 				if(counter < howManyBytes){
 					tempBuffer[counter] = inByte;
-
-          if(debugOut){
-            Serial.print("Byte  ");
-            Serial.print(counter);
-            Serial.print(" | ");
-            Serial.print(inByte);
-          }
 
 					counter++;
 				}
@@ -230,17 +241,6 @@ void readSerialBytes(){
           //servo1.write(servo1_value);
           // /servo2.write(servo2_value);
         }
-					
-        if(debugOut){
-          Serial.print("Expected length: ");
-          Serial.print(howManyBytes);
-          //Serial.print(" Speed: ");
-          //Serial.print(speed);
-          Serial.print(" M1: ");
-          Serial.print(stepper_value);
-          Serial.print(" M2: ");
-          Serial.println(stepper_value);
-        }
 			}
 		}
 
@@ -250,15 +250,6 @@ void readSerialBytes(){
 			//Serial.println(inputBuffer);
 		}
   }
-	
-	// Received an incomplete packet
-	else if(counter > 0){
-		if(debugOut){
-      Serial.println("Incomplete packet!");
-			Serial.println(counter);
-		}
-		counter = 0;
-	}
 }
 
 /*
@@ -367,46 +358,6 @@ void debugPWM(int delay_time){
   delay(1500);
 }
 
-/*
-
-void debugServos(int delay_time){
-  for(int i = 0; i < 180; i++){
-    servo1.write(i);
-    servo2.write(i);
-    delay(delay_time);
-  }
-
-  delay(500);
-
-  for(int i = 180; i > 0; i--){
-    servo1.write(i);
-    servo2.write(i);
-    delay(delay_time);
-  }
-
-  delay(500);
-}
-
-void debugSteppers(){
-  stepper.moveTo(200*default_microsteps);
-
-  while(stepper.isRunning()){
-    stepper.run();
-  }
-
-  delay(200);
-
-  stepper.moveTo(0*default_microsteps);
-
-  while(stepper.isRunning()){
-    stepper.run();
-  }
-
-  delay(200);
-
-}
-*/
-
 void setupLEDs(){
   for(int i = 0; i < TOTAL_LEDS; i++){
     if(led_values[i][3] == 1){
@@ -450,7 +401,7 @@ void setupLEDs(){
 }
 
 void setup() {
-  Serial.begin(1000000);
+  Serial.begin(BAUD_RATE);
   Serial.println("Starting drawing bot stepper model V1...");
   //Serial.setTimeout(10);
 
