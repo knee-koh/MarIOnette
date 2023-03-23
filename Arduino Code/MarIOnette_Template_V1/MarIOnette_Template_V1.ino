@@ -1,73 +1,58 @@
-/* MarIOnette demo with 1 stepper, 2 servos, and one 16pixel neopixel ring 
+/* 
 
-Because of Neopixels killing interrupts, PWMServo must be used, which slows down a timer to 50Hz
+MarIOnette template file for Arduino-compatible boards
 
-Teensy 3.2 has 3 timers that control a number of pins:
-FTM0	5, 6, 9, 10, 20, 21, 22, 23	    @488.28 Hz
-FTM1	3, 4	                          @488.28 Hz
-FTM2	25, 32	                        @488.28 Hz
+Tested on Arduino Nano (ATMega 328P), Arduino Uno, Teensy 3.2, Teensy 3.6, and Teensy 4.1
 
 */
+
+#define DEBUG_SETUP 1
 
 #include "config.h"
 #include <Arduino.h>
 #include <AccelStepper.h>
 #include <Servo.h>
-#include <Adafruit_NeoPixel.h>
+#include <Adafruit_NeoPixel.h> // Support for other indexable LEDs coming soon...
 
-
+// For AVR - based boards without a dedicated Serial buffer, we need to add a small delay between Serial reads
 #if defined(__AVR__)
   #define PARSE_INT 1
 #else
   #define PARSE_INT 0
 #endif
 
-//#include <PWMServo.h>
+/*
+
+If using Neopixels, we must use the PWMServo library. This is due to the Neopixel library disabling interrupts, which
+the Servo library depends on. This reduces the usable servo range to 0-180 (from the larger range of 700-2300).
+
+You can avoid this issue by using a dedicated PWM I2C board like the PCA9685 16 Channel PWM Servo Motor Driver.
+Alternatively, you can switch to indexable LEDs with a dedicated clock pin (APA102 or SK9822).
+
+Support for both of these is coming some time in the future (whenever I get some free time to work on this).
+
+*/
 #if TOTAL_LEDS > 0
   #include "PWMServo.h"
 #else
   #include <Servo.h>
 #endif
 
+// Interval timer for more precise timing (useful for stepper motors since they need a lot of pulses)
 //IntervalTimer myTimer;
 
-//ESP32Encoder encoder;
-
-#define EN_PIN              4 // Enable
-#define DIR_PIN             2 // Direction
-#define STEP_PIN            3 // Step
-#define CS_PIN              15 // Chip select
-
-#define STALL_VALUE         15 // [-64..63]
-
-#define SERVO_1             21
-#define SERVO_2             20
-#define NEOPIXEL_PIN        10 // Move to a different pin!!! see above
-
-#define R_SENSE             0.11f
-
-#define NUM_PIXELS          16
-
-#define PWM_PIN_1           6 // Move to another pin!!! 3, 4, 25, or 32 see above
-
-
-// 80 steps per mm for 16 microsteps, 160 for 32, 320 for 64, 640 for 128, 1280 for 256ss
-
-// Stepper Driver Initialization
-AccelStepper stepper = AccelStepper(stepper.DRIVER, STEP_PIN, DIR_PIN);
-
-uint32_t steps_per_mm = 1280;
-uint16_t steps_per_rev = 200;
-uint32_t default_microsteps = 128;
-uint32_t microsteps_per_rev = steps_per_rev * default_microsteps;
-uint32_t stepper_max_speed = 5000000;
-uint32_t stepper_max_acceleration = 5000000;
-
 // Servos
-#if TOTAL_MOTORS > 0 && TOTAL_LEDS > 0
+#if TOTAL_SERVOS > 0 && TOTAL_LEDS > 0
   PWMServo servos[TOTAL_MOTORS];
-#elif TOTAL_MOTORS > 0 && TOTAL_LEDS == 0
+#elif TOTAL_SERVOS > 0 && TOTAL_LEDS == 0
   Servo servos[TOTAL_MOTORS];
+#endif
+
+// Steppers
+#if TOTAL_STEPPERS > 0
+  AccelStepper steppers[TOTAL_STEPPERS];
+#else
+  AccelStepper steppers[1];
 #endif
 
 // Neopixels
@@ -77,10 +62,10 @@ uint32_t stepper_max_acceleration = 5000000;
   Adafruit_NeoPixel neopixels[1];
 #endif
 
-//Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRBW + NEO_KHZ800);
 
-// MarIOnette
-unsigned int counter;
+
+// MarIOnette serial
+unsigned int counter = 0;
 unsigned int howManyBytes = 0;
 
 // Expected packet
@@ -99,78 +84,79 @@ long ledValue_B = 0;
 
 // To save on Serial bandwidth, read in two bytes per motor and combine them into an int
 void readSerialBytes(){
-	int debugOut = 0;
-	char inByte;
+  int debugOut = 0;
+  char inByte;
 
-	if(Serial.available() > 0){
-		char mode = Serial.read();
+  if(Serial.available() > 0){
+    char mode = Serial.read();
 
-		// Blender sending data...
-		if(mode == 'A'){
-			counter = 0;
+    // Blender sending data...
+    if(mode == 'A'){
+      counter = 0;
 
       if(PARSE_INT){
         delay(1);
       }
 
-			// Read in first bytes to get message length
-			char one = Serial.read();
+      // Read in first bytes to get message length
+      char one = Serial.read();
       
       if(PARSE_INT){
         delay(1);
       }
 
-			char two = Serial.read();
-			howManyBytes = word(one, two) + expectedSpeedBytes;
-			
-			if(debugOut){
-				Serial.print("Expecting bytes: ");
-				Serial.println(howManyBytes);
-			}
+      char two = Serial.read();
+      howManyBytes = word(one, two) + expectedSpeedBytes;
+      
+      if(debugOut){
+        Serial.print("Expecting bytes: ");
+        Serial.println(howManyBytes);
+      }
 
-			char tempBuffer[howManyBytes];
+      char tempBuffer[howManyBytes];
 
-			while(Serial.available()){
+      while(Serial.available()){
         if(PARSE_INT){
           delay(1);
         }
 
-				inByte = Serial.read();
-				
-				// Keep reading in case last byte is the stop char
-				if(counter < howManyBytes){
-					tempBuffer[counter] = inByte;
+        inByte = Serial.read();
+        
+        // Keep reading in case last byte is the stop char
+        if(counter < howManyBytes){
+          tempBuffer[counter] = inByte;
 
-					counter++;
-				}
+          counter++;
+        }
 
-				// Received too many bytes but no stop character...
-				else if(counter >= howManyBytes && inByte != '.'){							
-					while(Serial.available()){
-						Serial.read();
-						counter++;
-					}
+        // Received too many bytes but no stop character...
+        else if(counter >= howManyBytes && inByte != '.'){              
+          while(Serial.available()){
+            Serial.read();
+            counter++;
+          }
 
-					if(debugOut){
-						Serial.print("Too many bytes, expected ");
-						Serial.print(howManyBytes);
-						Serial.print(" and got ");
-						Serial.println(counter);
-					}
+          if(debugOut){
+            Serial.print("Too many bytes, expected ");
+            Serial.print(howManyBytes);
+            Serial.print(" and got ");
+            Serial.println(counter);
+          }
 
-					counter = 0;
-					break;
-				}
+          counter = 0;
+          break;
+        }
 
-				// Right amount of bytes received, set motors and LEDs
-				else if(counter == howManyBytes && (inByte == '.' || inByte == 46)){
-					if(debugOut){
-						Serial.println("Success!");
-					}
+        // Right amount of bytes received, set motors and LEDs
+        else if(counter == howManyBytes && (inByte == '.' || inByte == 46)){
+          if(debugOut){
+            Serial.println("Success!");
+          }
 
           if(TOTAL_MOTORS > 0){
             //speed = word(tempBuffer[0], tempBuffer[1]);
             for(int i = 0; i < TOTAL_MOTORS; i++){
+              int j = 0;
               if(motor_values[i][0] == 1){
                 if(TOTAL_LEDS > 0){
                   servos[i].write(word(tempBuffer[i*2+expectedSpeedBytes], tempBuffer[i*2+expectedSpeedBytes+1]));
@@ -183,6 +169,11 @@ void readSerialBytes(){
 
               else if(motor_values[i][0] == 2){
                 analogWrite(motor_values[i][1], word(tempBuffer[i*2+expectedSpeedBytes], tempBuffer[i*2+expectedSpeedBytes+1]));
+              }
+
+              else if(motor_values[i][0] == 5){
+                steppers[j].moveTo(word(tempBuffer[i*2+expectedSpeedBytes], tempBuffer[i*2+expectedSpeedBytes+1]));
+                j++;
               }
             }
           }
@@ -224,138 +215,10 @@ void readSerialBytes(){
               }
             }
           }
-
-          /*
-					stepper_value = word(tempBuffer[2], tempBuffer[3]);
-					servo1_value = word(tempBuffer[4], tempBuffer[5]);
-          servo2_value = word(tempBuffer[6], tempBuffer[7]);
-          ledValue_R = word(tempBuffer[8], tempBuffer[9]);
-          ledValue_G = word(tempBuffer[10], tempBuffer[11]);
-          ledValue_B = word(tempBuffer[12], tempBuffer[13]);
-          */
-          
-					// Update steppers
-					//stepper.moveTo(stepper_value);
-
-          // Update servos
-          //servo1.write(servo1_value);
-          // /servo2.write(servo2_value);
         }
-			}
-		}
-
-		// Spit buffer back out
-		else if(mode == 'P'){
-			Serial.print("Buffer: ");
-			//Serial.println(inputBuffer);
-		}
-  }
-}
-
-/*
-void stepper_update(){
-  stepper.run();
-}
-*/
-
-void debugLeds(int delay_time){
-  for(int i = 0; i < 255; i++){
-    for(int j = 0; j < NUM_PIXELS; j++){
-      neopixels[0].setPixelColor(j, i, 0, 0, 0);
+      }
     }
-
-    neopixels[0].show();
-    delayMicroseconds(delay_time);
   }
-
-  delay(200);
-
-  for(int i = 254; i >= 0; i--){
-    for(int j = 0; j < NUM_PIXELS; j++){
-      neopixels[0].setPixelColor(j, i, 0, 0, 0);
-    }
-
-    neopixels[0].show();
-    delayMicroseconds(delay_time);
-  }
-
-  delay(200);
-
-  for(int i = 0; i < 255; i++){
-    for(int j = 0; j < NUM_PIXELS; j++){
-      neopixels[0].setPixelColor(j, 0, i, 0, 0);
-    }
-   
-    neopixels[0].show();
-    delayMicroseconds(delay_time);
-  }
-
-  for(int i = 254; i >= 0; i--){
-    for(int j = 0; j < NUM_PIXELS; j++){
-      neopixels[0].setPixelColor(j, 0, i, 0, 0);
-    }
-
-    neopixels[0].show();
-    delayMicroseconds(delay_time);
-  }
-
-  delay(200);
-
-  for(int i = 0; i < 255; i++){
-    for(int j = 0; j < NUM_PIXELS; j++){
-      neopixels[0].setPixelColor(j, 0, 0, i, 0);      
-    }
-   
-    neopixels[0].show();
-    delayMicroseconds(delay_time);
-  }
-
-  for(int i = 254; i >= 0; i--){
-    for(int j = 0; j < NUM_PIXELS; j++){
-      neopixels[0].setPixelColor(j, 0, 0, i, 0);
-    }
-
-    neopixels[0].show();
-    delayMicroseconds(delay_time);
-  }
-
-  delay(200);
-
-  for(int i = 0; i < 255; i++){
-    for(int j = 0; j < NUM_PIXELS; j++){
-      neopixels[0].setPixelColor(j, 0, 0, 0, i);
-    }
-   
-    neopixels[0].show();
-    delayMicroseconds(delay_time);
-  }
-
-  for(int i = 254; i >= 0; i--){
-    for(int j = 0; j < NUM_PIXELS; j++){
-      neopixels[0].setPixelColor(j, 0, 0, 0, i);
-    }
-
-    neopixels[0].show();
-    delayMicroseconds(delay_time);
-  }
-
-  delay(200);
-}
-
-void debugPWM(int delay_time){
-  for(int i = 0; i < 50; i++){
-    analogWrite(PWM_PIN_1, i);
-    delayMicroseconds(delay_time);
-  }
-
-  delay(500);
-
-  for(int i = 50; i >= 0; i--){
-    analogWrite(PWM_PIN_1, i);
-    delayMicroseconds(delay_time);
-  }
-
-  delay(1500);
 }
 
 void setupLEDs(){
@@ -400,96 +263,82 @@ void setupLEDs(){
   }
 }
 
-void setup() {
-  Serial.begin(BAUD_RATE);
-  Serial.println("Starting drawing bot stepper model V1...");
-  //Serial.setTimeout(10);
-
-  // Servos
-  //servo1.attach(SERVO_1);
-  //servo2.attach(SERVO_2);
+void setupMotors(){
   for(int i = 0; i < TOTAL_MOTORS; i++){
+    // Servos
     if(motor_values[i][0] == 1){
       servos[i].attach(motor_values[i][1]);
     }
 
+    // PWM pin
     else if(motor_values[i][0] == 2){
       pinMode(motor_values[i][1], OUTPUT);
     }
   }
+}
 
-  Serial.println("Servo init done");
+void setupSteppers(){
+  for(int i = 0; i < TOTAL_STEPPERS; i++){
+    for(int j = 0; j < TOTAL_MOTORS; j++){
+      if(motor_values[j][0] == 5){
+        steppers[i] = AccelStepper(steppers[i].DRIVER, motor_values[j][1], motor_values[j][2]);
+
+        steppers[i].setMaxSpeed(motor_values[j][4]); // 100mm/s @ 80 steps/mm
+        steppers[i].setAcceleration(motor_values[j][5]); // 2000mm/s^2
+        steppers[i].setPinsInverted(false, false, true);
+        steppers[i].enableOutputs();
+        i++;
+
+        if(DEBUG_SETUP){
+          Serial.print("Stepper number ");
+          Serial.print(i+1);
+          Serial.print(" Step Pin: ");
+          Serial.print(motor_values[j][1]);
+          Serial.print(" Dir Pin: ");
+          Serial.print(motor_values[j][2]);
+          Serial.print(" Speed: ");
+          Serial.print(motor_values[j][4]);
+          Serial.print(" Acceleration: ");
+          Serial.println(motor_values[j][5]);
+        }
+      }
+    }
+  }
+}
+
+void setup() {
+  // Start Serial monitor
+  Serial.begin(BAUD_RATE);
+  Serial.println("Starting MarIOnette initialization...");
+
+  // Servo and motor init
+  if(TOTAL_MOTORS > 0){
+    setupMotors();
+    Serial.println("Servo init done");
+  }
 
   // Neopixel
   if(TOTAL_LEDS > 0){
     setupLEDs();
+    Serial.println("Neopixel ring init done");
   }
 
-  pinMode(PWM_PIN_1, OUTPUT);
-  //analogWriteResolution(10);
-
-  /*
-  pinMode(NEOPIXEL_PIN, OUTPUT);
-  strip.begin();
-  strip.clear();
-  strip.show();
-  strip.setBrightness(30);
-  */
-  
-  Serial.println("Neopixel ring init done");
-
   // Stepper motor initialization
-  /*
-  SPI.begin();
-
-  pinMode(EN_PIN, OUTPUT);
-  pinMode(STEP_PIN, OUTPUT);
-  pinMode(DIR_PIN, OUTPUT);
-  digitalWrite(EN_PIN, LOW);
-
-  Serial.println("Stepper pins init done");
-
-  driver.begin();
-  driver.toff(4);
-  driver.blank_time(24);
-  driver.rms_current(400); // mA
-  driver.microsteps(default_microsteps);
-  driver.TCOOLTHRS(0xFFFFF); // 20bit max
-  driver.THIGH(0);
-  driver.semin(5);
-  driver.semax(2);
-  driver.sedn(0b01);
-  driver.sgt(STALL_VALUE);
-
-  driver.en_pwm_mode(true);       // Toggle stealthChop on TMC2130/2160/5130/5160
-  //driver_L.en_spreadCycle(true);   // Toggle spreadCycle on TMC2208/2209/2224
-  driver.pwm_autoscale(true);     // Needed for stealthChop
-
-  stepper.setMaxSpeed(stepper_max_speed); // 100mm/s @ 80 steps/mm
-  stepper.setAcceleration(stepper_max_acceleration); // 2000mm/s^2
-  stepper.setEnablePin(EN_PIN);
-  stepper.setPinsInverted(false, false, true);
-  stepper.enableOutputs();
-  */
-
+  setupSteppers();
+  
   //myTimer.begin(stepper_update, 15);
   //myTimer.priority(0);
-  
-  //debugLeds(10);
-
-  Serial.println("Stepper init done");
 
   Serial.println("Setup finished!");
 }
 
 void loop() {
-  /*
-  debugSteppers();
-  debugLEDs(10);
-  debugServos(2);
-  */
-
-  //debugPWM(10000);
+  // Begin reading serial port for incoming commands
   readSerialBytes();
-  
+
+  if(TOTAL_STEPPERS > 0){
+    for(int i = 0; i < TOTAL_STEPPERS; i++){
+      steppers[i].run();
+    }
+  }
 }
