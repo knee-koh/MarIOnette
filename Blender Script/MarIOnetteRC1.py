@@ -13,7 +13,7 @@ bl_info = {
             "category": "Animation"
         }
 
-import bpy, sys, glob, os, time, math, linecache
+import bpy, sys, glob, os, time, math, linecache, requests
 
 try:
     import serial
@@ -26,6 +26,14 @@ except:
     import serial
     print("Done installing pyserial, enjoy MarIOnette!")
 
+
+try:
+    import wget
+except:
+    import subprocess, pip
+    subprocess.check_call([sys.executable, "-m", "pip", "install", 'wget'])
+
+    import wget
 
 from numpy import interp
 from math import degrees, acos, radians
@@ -74,6 +82,9 @@ currentBone = ""
 currentAxis = ""
 currentListValue = 0
 configSize = 0
+
+
+#filename = wget.download(url, out=output_directory)
 
 def num_to_range(num, inMin, inMax, outMin, outMax):
   #return outMin + (float(num - inMin) / float(inMax - inMin) * (outMax - outMin))
@@ -565,7 +576,7 @@ class ListItem(bpy.types.PropertyGroup):
                  ("LewanSoul Bus Servo", "LewanSoul Bus Servo", "")],
         name = "Select MotorType")
         
-    ServoBaud: prop.EnumProperty(
+    StepperMicrosteps: prop.EnumProperty(
         items = [('1', '1', ''),
                  ('2', '2', ''),
                  ('4', '4', ''),
@@ -589,7 +600,7 @@ class ListItem(bpy.types.PropertyGroup):
         description = "Specify the stepper max Acceleration",
         default = 1000)
 
-    Microsteps: prop.EnumProperty(
+    ServoBaud: prop.EnumProperty(
         items = [('9600', '9600', ''),
                  ('19200', '19200', ''),
                  ('34800', '34800', ''),
@@ -643,14 +654,14 @@ class ListItem(bpy.types.PropertyGroup):
     MinMotorValue: prop.IntProperty(
         name = "Min motor value from 0",
         description = "Enter the minimum value the bone travels",
-        default = 0,
+        default = 1000,
         min = 0,
         max = 655354)
 
     MaxMotorValue: prop.IntProperty(
         name = "Max motor value from 0",
         description = "Enter the maximum value the bone travels",
-        default = 1000,
+        default = 2000,
         min = 0,
         max = 65534)
 
@@ -872,6 +883,7 @@ class SceneProperties(bpy.types.PropertyGroup):
 
     ServoSpeedEnable: prop.BoolProperty(
         name = "Servo Speed Enable",
+        default = True,
         description = "Adjust servo speed if you have a Dynamixel or other fancy servo. Note: This value is not written to file or to Arduino when exported")
 
     SerialConnected: prop.BoolProperty(
@@ -898,7 +910,7 @@ class SceneProperties(bpy.types.PropertyGroup):
     SendLEDVals: prop.BoolProperty(
         name = "Send LED values?",
         description = "True or False?",
-        default = False)
+        default = True)
 
     ShowInputs: prop.BoolProperty(
         name = "Display incoming values",
@@ -973,7 +985,7 @@ class SceneProperties(bpy.types.PropertyGroup):
                  ('.h File', '.h File', '')
                  ],
         description = "Choose where the config will be stored",
-        default = 'EEPROM')
+        default = '.h File')
     
     ConfigEEPROMSize: prop.IntProperty(
         name = "Size of EEPROM",
@@ -981,6 +993,10 @@ class SceneProperties(bpy.types.PropertyGroup):
         min = 0,
         max = 100000,
         default = 1024)
+
+    FolderName: prop.StringProperty(
+        name="Folder Name",
+        description = "Name the project folder. Make sure to separate words with underscores, not spaces.")
 
 # Create list of servos
 class LIST_UL_Items(bpy.types.UIList):
@@ -998,7 +1014,7 @@ class LIST_UL_Items(bpy.types.UIList):
 # ui list item actions
 class Uilist_actions(bpy.types.Operator):
     bl_idname = "my_list.list_action"
-    bl_label = "List Action"
+    bl_label = "Values to send"
 
     action: bpy.props.EnumProperty(
         items=(
@@ -1022,6 +1038,7 @@ class Uilist_actions(bpy.types.Operator):
         else:
             if self.action == 'DOWN' and idx < len(scn.my_list) - 1:
                 item_next = scn.my_list[idx+1].name
+                self.description = "TESTING..."
                 scn.my_list.move(idx, idx + 1)
                 scn.list_index += 1
                 info = 'Item %d selected' % (scn.list_index + 1)
@@ -1141,7 +1158,8 @@ class Uilist_actions2(bpy.types.Operator):
 # Serial connection button
 class ConnectSerial(bpy.types.Operator):
     bl_idname="tl.connect_serial"
-    bl_label="Connect to serial port"
+    bl_label="Connect"
+    bl_description="Connect to serial port"
 
     def execute(self, context):
         scn = bpy.context.scene
@@ -1161,7 +1179,8 @@ class ConnectSerial(bpy.types.Operator):
 # Disconnects from current serial port
 class DisconnectSerial(bpy.types.Operator):
     bl_idname="tl.disconnect_serial"
-    bl_label="Disconnect from serial port"
+    bl_label="Disconnect"
+    bl_description="Disconnect from serial port"
 
     def execute(self, context):
         scn = context.scene
@@ -1183,6 +1202,7 @@ class DisconnectSerial(bpy.types.Operator):
 class ToggleArmatureAxisVisibility(bpy.types.Operator):
     bl_idname="tl.toggle_bone_axes"
     bl_label="Toggle bone axes"
+    bl_description="Turn the visibility of bone axes on or off"
 
     def execute(self, context):
         scn = bpy.context.scene
@@ -1197,6 +1217,7 @@ class ToggleArmatureAxisVisibility(bpy.types.Operator):
 class LockOtherBoneAxes(bpy.types.Operator):
     bl_idname="tl.lock_bone_axes"
     bl_label="Lock bone axes"
+    bl_description="Lock all axes except for the selected one"
 
     def execute(self, context):
         global currentArmature, currentBone, currentAxis, currentListValue
@@ -1230,6 +1251,7 @@ class LockOtherBoneAxes(bpy.types.Operator):
 class UnlockBoneAxes(bpy.types.Operator):
     bl_idname="tl.unlock_bone_axes"
     bl_label="Unlock bone axes"
+    bl_description="Unlock all axes except for the selected one"
 
     def execute(self, context):
         global currentArmature, currentBone, currentAxis, currentListValue
@@ -1328,7 +1350,8 @@ class SendSingle(bpy.types.Operator):
 # Sync with arduino
 class Sync(bpy.types.Operator):
     bl_idname="tl.sync_conf"
-    bl_label="Send setup config to microcontroller"
+    bl_label="Generate"
+    bl_description="Generate code and .h config file in specified directory"
 
     LED_index_offset = 10
 
@@ -1336,6 +1359,23 @@ class Sync(bpy.types.Operator):
         global serialport, configSize, outputfile
 
         scn = context.scene #scene elements
+
+        # Create a directory and download the Arduino file from Github
+        # Download from Github
+        url = "https://raw.githubusercontent.com/knee-koh/MarIOnette/main/Arduino%20Code/MarIOnette_Template_V1/MarIOnette_Template_V1.ino"
+        res = requests.get(url)
+
+        # Create new folder in selected destination
+        folder_name = scn.scn_prop.FolderName
+        new_directory = bpy.path.abspath(scn.scn_prop.FileDirectory) + "/" + folder_name + "/"
+        if not os.path.exists(new_directory):
+            os.mkdir(new_directory)
+
+        # Copy downloaded code into new code
+        filenamez = new_directory + folder_name + ".ino"
+        file = open(filenamez, "w")
+        file.write(res.text)
+        file.close()
 
         configurationType = scn.scn_prop.ConfigType
 
@@ -1357,7 +1397,7 @@ class Sync(bpy.types.Operator):
                 elif scn.my_list[item].MotorType == "Bi-directional PWM":
                     serialport.write('4'.encode() + str(scn.my_list[item].PWMPin1).encode() + str(scn.my_list[item].PWMPin2).encode() + '.'.encode())
                 elif scn.my_list[item].MotorType == "Stepper":
-                    serialport.write('5'.encode() + str(scn.my_list[item].Pin1).encode() + str(scn.my_list[item].Pin2).encode() + '.'.encode())
+                    serialport.write('5'.encode() + str(scn.my_list[item].StepPin).encode() + str(scn.my_list[item].DirPin).encode() + str(scn.my_list[item].StepperMicrosteps).encode() + str(scn.my_list[item].Speed).encode() + str(scn.my_list[item].Acceleration).encode() + '.'.encode())
                 elif scn.my_list[item].MotorType == "Dynamixel":
                     serialport.write('6'.encode() + str(scn.my_list[item].RXPin).encode() + str(scn.my_list[item].TXPin).encode()  + str(scn.my_list[item].TXPin).encode() + '.'.encode())
                 elif scn.my_list[item].MotorType == "LewanSoul Bus Servo":
@@ -1368,12 +1408,34 @@ class Sync(bpy.types.Operator):
                     serialport.write('10'.encode() + str(scn.my_list2[item].DataPin).encode() + '.'.encode())
 
         elif configurationType == ".h File":
-            fullpath = os.path.join(bpy.path.abspath(scn.scn_prop.FileDirectory), "config.h")
+            # Count each actuator type
+            num_servos = 0
+            num_pwm = 0
+            num_steppers = 0
+            num_dual_pwm = 0
+            num_lewansoul = 0
+            num_dynamixel = 0
+            num_neopixel = 0
+            num_pwm_led = 0
+
+            for item in range(0, len(scn.my_list)):
+                if scn.my_list[item].MotorType == "Servo":
+                    num_servos += 1
+                elif scn.my_list[item].MotorType == "PWM":
+                    num_pwm += 1
+                elif scn.my_list[item].MotorType == "Stepper":
+                    num_steppers += 1
+
+            fullpath = os.path.join(new_directory, "config.h")
             outputfile = open(fullpath, 'wb')
             outputfile.write("// MarIOnette generated config file for motors and LEDs //".encode())
             #outputfile.write(('\n' + "total_motors = " + str(len(scn.my_list)) + ";" + '\n').encode())
+            outputfile.write(('\n' + "#define BAUD_RATE " + str(scn.scn_prop.BaudRate)).encode())
             outputfile.write(('\n' + "#define TOTAL_MOTORS " + str(len(scn.my_list))).encode())
             outputfile.write(('\n' + "#define TOTAL_LEDS " + str(len(scn.my_list2)) + '\n').encode())
+            outputfile.write(('\n' + "#define TOTAL_SERVOS " + str(num_servos) + '\n').encode())
+            outputfile.write(('\n' + "#define TOTAL_PWM_MOTORS " + str(num_pwm) + '\n').encode())
+            outputfile.write(('\n' + "#define TOTAL_STEPPERS " + str(num_steppers) + '\n').encode())
             outputfile.write(('\n' + "unsigned long motor_values[" + str(len(scn.my_list)) + "][10] = {").encode())
 
             for item in range(0, len(scn.my_list)):
@@ -1384,6 +1446,8 @@ class Sync(bpy.types.Operator):
                     outputfile.write(("{1, " + str(scn.my_list[item].ServoPin) + ", 0, 0, 0, 0, 0, 0, 0, 0}," + '\n').encode())
                 elif scn.my_list[item].MotorType == "PWM":
                     outputfile.write(("{2, " + str(scn.my_list[item].PWMPin1) + ", 0, 0, 0, 0, 0, 0, 0, 0}," + '\n').encode())
+                elif scn.my_list[item].MotorType == "Stepper":
+                    outputfile.write(("{5, " + str(scn.my_list[item].StepPin) + ", " + str(scn.my_list[item].DirPin) + ", " + str(scn.my_list[item].StepperMicrosteps) + ", " + str(scn.my_list[item].Speed) + ", " + str(scn.my_list[item].Acceleration) + ", 0, 0, 0, 0}," + '\n').encode())
 
             outputfile.write(("};" + '\n' + '\n').encode())
 
@@ -1399,7 +1463,10 @@ class Sync(bpy.types.Operator):
 
                 #outputfile.write(("};" + '\n' + '\n').encode())
 
-            outputfile.write(("};" + '\n' + '\n').encode())
+                outputfile.write(("};" + '\n' + '\n').encode())
+
+            else:
+                outputfile.write(("unsigned long led_values[0][0];").encode())
 
             outputfile.close()
 
@@ -1722,6 +1789,7 @@ class OutputToTextFile(bpy.types.Operator):
 class OutputToTextFileCache(bpy.types.Operator):
     bl_idname="tl.output_text_file_cache"
     bl_label="Cache file"
+    bl_description="Save animation to the specified file name and location"
     
     global last_sync, done_writing
 
@@ -1768,7 +1836,8 @@ class OutputToTextFileCache(bpy.types.Operator):
 
 class OutputToTextFileCancel(bpy.types.Operator):
     bl_idname="tl.cache_cancel"
-    bl_label="Cancel"   
+    bl_label="Cancel"
+    bl_description="Cancel file caching" 
 
 
     def execute(self, context):
@@ -1894,7 +1963,8 @@ class SetKeyframe(bpy.types.Operator):
 
 class refreshSerialPorts(bpy.types.Operator):
     bl_idname = "tl.refresh_ports"
-    bl_label = "Refresh serial port list"
+    bl_label = "Refresh list"
+    bl_description="Refresh list of serial ports"
 
     def execute(self, context):
         update_serial_ports()
@@ -1937,14 +2007,14 @@ class MPANEL_PT_MarIOnette_SerialPanel(bpy.types.Panel):
 
         # Check box to toggle serial connection
         col = layout.column()
-        layout.prop(scn.scn_prop, "ServoSpeedEnable")
-        col.prop(scn.scn_prop, "ServoSpeed") if scn.scn_prop.ServoSpeedEnable else 0
+        #layout.prop(scn.scn_prop, "ServoSpeedEnable")
+        #col.prop(scn.scn_prop, "ServoSpeed") if scn.scn_prop.ServoSpeedEnable else 0
         layout.prop(scn.scn_prop, "SerialEnable")
-        layout.prop(scn.scn_prop, "UseCache")
-        layout.operator("tl.select_cache_file") if scn.scn_prop.UseCache else 0
-        layout.label(text = str(cachefilepath)) if scn.scn_prop.UseCache else 0
-        layout.prop(scn.scn_prop, "ReceivingValues")
-        layout.prop(scn.scn_prop, "SendLEDVals")
+        #layout.prop(scn.scn_prop, "UseCache")
+        #layout.operator("tl.select_cache_file") if scn.scn_prop.UseCache else 0
+        #layout.label(text = str(cachefilepath)) if scn.scn_prop.UseCache else 0
+        #layout.prop(scn.scn_prop, "ReceivingValues")
+        #layout.prop(scn.scn_prop, "SendLEDVals")
         layout.operator("tl.refresh_ports") if scn.scn_prop.SerialEnable else 0
 
         # Drop Down menu with serial ports and baud rate selection
@@ -1956,7 +2026,7 @@ class MPANEL_PT_MarIOnette_SerialPanel(bpy.types.Panel):
         layout.operator("tl.disconnect_serial") if scn.scn_prop.SerialEnable else 0
 
         # Send command once, receive input, and then disconnect
-        layout.operator("tl.send_single") if scn.scn_prop.SerialEnable else 0
+        #layout.operator("tl.send_single") if scn.scn_prop.SerialEnable else 0
 
         # New row?
         col = layout.column()
@@ -1988,11 +2058,16 @@ class MPANEL_PT_MarIOnette_ActuatorPanel(bpy.types.Panel):
         # Toggle armature bone axis visibility
         #col.prop()
 
+        col = layout.column()
+        #col.prop(scn.scn_prop, "ServoSpeed")
+
         rows = 2
         row = layout.row()
         row.template_list("LIST_UL_Items", "", scn, "my_list", scn, "list_index" )
         
+
         col = row.column(align=True)
+
         col.operator("my_list.list_action", icon='ADD', text="").action = 'ADD'
         col.operator("my_list.list_action", icon='REMOVE', text="").action = 'REMOVE'
         col.separator()
@@ -2046,11 +2121,12 @@ class MPANEL_PT_MarIOnette_ActuatorPanel(bpy.types.Panel):
                     col.prop(item, "TXPin")
                     col.prop(item, "RXPin")
                     col.prop(item, "ServoBaud")
+                    col.prop(scn.scn_prop, "ServoSpeed")
                 elif scn.my_list[value].MotorType == 'Stepper':
                     col.prop(item, "DirPin")
                     col.prop(item, "StepPin")
-                    col.prop(item, "EnPin")
-                    col.prop(item, "Microsteps")
+                    #col.prop(item, "EnPin")
+                    col.prop(item, "StepperMicrosteps")
                     col.prop(item, "Speed")
                     col.prop(item, "Acceleration")
 
@@ -2228,7 +2304,7 @@ class MPANEL_PT_MarIOnette_LedPanel(bpy.types.Panel):
 
 # Sync up MarIOnette config with microcontroller (store to EEPROM, SD card, or .h file)?
 class MPANEL_PT_MarIOnette_SyncConfig(bpy.types.Panel):
-    bl_label="Sync Panel"
+    bl_label="Sync"
     bl_space_type="VIEW_3D"
     bl_region_type="UI"
     bl_category="MarIOnette"
@@ -2241,8 +2317,8 @@ class MPANEL_PT_MarIOnette_SyncConfig(bpy.types.Panel):
         scn = context.scene #scene elements
 
         col = layout.column()
-        layout.label(text="Sync motor and led configuration with microcontroller")
-        layout.prop(scn.scn_prop,"ConfigType")
+        layout.label(text="Create configuration file and import Arduino template from Github")
+        #layout.prop(scn.scn_prop,"ConfigType")
 
         if scn.scn_prop.ConfigType == "EEPROM":
             layout.label(text="Current config size: " + str(configSize))
@@ -2256,6 +2332,7 @@ class MPANEL_PT_MarIOnette_SyncConfig(bpy.types.Panel):
             #layout.prop(scn.scn_prop, "FileName")
             col = layout.column()
             layout.label(text="Uncheck \"relative path box\" in the file browser to display more readable path")
+            layout.prop(scn.scn_prop, "FolderName", text ="")
             layout.prop(scn.scn_prop, "FileDirectory", text = "")
 
         if (scn.scn_prop.ConfigType == "EEPROM" and configSize < scn.scn_prop.ConfigEEPROMSize) or scn.scn_prop.ConfigType != "EEPROM":
@@ -2347,9 +2424,12 @@ class MPANEL_PT_MarIOnette_CachePanel(bpy.types.Panel):
                 
                 col = layout.column()
                 layout.prop(scn.scn_prop, "WriteCacheHeader")
-                layout.prop(scn.scn_prop, "LEDMultiSingle") if scn.scn_prop.WriteCacheHeader else 0
+                layout.prop(scn.scn_prop, "LEDMultiSingle") if scn.scn_prop.WriteCacheHeader else layout.label(text = "No Cache File Selected")
                 layout.operator("tl.output_text_file_cache")
                 layout.label(text="Please make sure the right animation is active before output")
+                layout.prop(scn.scn_prop, "UseCache")
+                layout.operator("tl.select_cache_file") if scn.scn_prop.UseCache else 0
+                layout.label(text = str(cachefilepath)) if scn.scn_prop.UseCache else 0
 
         else:
             layout.label(text="Please uncheck \"Receiving Joint Angles\" in Serial Setup Tab found above in the MarIOnette panel")        
