@@ -15,7 +15,7 @@ Material: PLA
 You will need the following items:
 
 | Part  | Amount | Amazon Link |
-| ------------- | ------------- |
+| ------------- | ------------- | ------------- |
 | Arduino Nano | 1 | [Link](https://www.amazon.com/Deegoo-ATmega328P-Microcontroller-Board-Arduino/dp/B07R9VWD39/ref=sr_1_8?crid=3G6R5IGE3AM5E&keywords=arduino+nano&qid=1680816706&sprefix=arduino+nano%2Caps%2C146&sr=8-8) |
 | MG 996R Servo | 2 | [Link](https://www.amazon.com/Treedix-MG996R-Servo-High-Torque-Helicopter/dp/B08743N181/ref=sr_1_4?crid=19DZMO7J2P28Y&keywords=mg+996+r+servo+motor+2&qid=1680816580&sprefix=mg+996+r+servo+motor+%2Caps%2C150&sr=8-4) |
 | Metal Servo Horn | 2 | [Link](https://www.amazon.com/Hobbypark-5-Pack-Aluminum-Futaba-Motors/dp/B06XPYBTBP/ref=sr_1_4?crid=Q4BPQ4OJHD34&keywords=metal+servo+horn&qid=1680816607&sprefix=metal+servo+hor%2Caps%2C145&sr=8-4)|
