@@ -66,12 +66,19 @@ For MarIOnette to send values to the microcontroller, you must keep the MarIOnet
 
 ### MarIOnette currently supports the following actuators:
 Servos
+
 GIFs of examples
+
 PWM - Piro or playground
+
 GIFs of examples
+
 ON/OFF (Solenoid)
+
 GIFs of examples - Piro
+
 Dynamixels and Bus Servos
+
 GIFs of examples - Spidahbot
 
 ### And LEDs:
