@@ -78,4 +78,4 @@ For MarIOnette to send values to the microcontroller, you must keep the MarIOnet
 - Single channel
 - Gif of glowing led from playground
 - Neopixels
-- Gif of playground or piro example
+![](https://github.com/knee-koh/MarIOnette/Media/Gifs/LEDRing.gif)
