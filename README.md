@@ -69,7 +69,7 @@ For MarIOnette to send values to the microcontroller, you must keep the MarIOnet
 ### MarIOnette currently supports the following actuators:
 Servos
 
-![](Media/Gifs/DrawBotV1.gif)
+![](Media/Gifs/Post It Bot.gif)
 
 PWM
 
