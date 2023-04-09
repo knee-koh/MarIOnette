@@ -1,6 +1,8 @@
-![](Media/Photos/LogoV1.png)
+![](Media/Photos/LogoV2.png)
 
 ## MarIOnette is a Blender plugin for controlling Arduino-based microcontrollers over Serial
+
+![](Media/Gifs/SpidahBahtVid.gif)
 
 [See it in action here](https://www.youtube.com)
 
@@ -65,19 +67,27 @@ MarIOnette has been tested on most AVR-Based Arduino-compatible microcontrollers
 For MarIOnette to send values to the microcontroller, you must keep the MarIOnette tab open and visible in your Blender viewport
 
 ### MarIOnette currently supports the following actuators:
-- Servos
+Servos
+
+![](Media/Gifs/DrawBotV1.gif)
+
+PWM
+
 - GIFs of examples
-- PWM - Piro or playground
-- GIFs of examples
-- ON/OFF (Solenoid)
-- GIFs of examples - Piro
-- Dynamixels and Bus Servos
-- GIFs of examples - Spidahbot
+
+ON/OFF (Solenoid)
+
+![](Media/Gifs/Piro1.gif)
+
+Dynamixels and Bus Servos
+
+![](Media/Gifs/SpidahBahtVid.gif)
 
 ### And LEDs:
-- Single channel
-- Gif of glowing led from playground
-- Neopixels
+Neopixels
+
 ![](Media/Gifs/LEDTEST.gif)
+
+Single channel and other types coming soon
 
 Have Fun!
