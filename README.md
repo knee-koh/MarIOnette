@@ -1,5 +1,5 @@
 PICTURE OR GIF OF LOGO
-![](https://github.com/knee-koh/MarIOnette/tree/main/Media/Photos/LogoV1.png)
+![](Media/Photos/LogoV1.png)
 ![hi](https://github.com/knee-koh/MarIOnette/tree/main/Media/Gifs/LEDTEST.gif)
 
 ## MarIOnette is a Blender plugin for controlling Arduino-based microcontrollers over Serial
