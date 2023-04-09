@@ -1,6 +1,4 @@
-PICTURE OR GIF OF LOGO
 ![](Media/Photos/LogoV1.png)
-![hi](https://github.com/knee-koh/MarIOnette/tree/main/Media/Gifs/LEDTEST.gif)
 
 ## MarIOnette is a Blender plugin for controlling Arduino-based microcontrollers over Serial
 
@@ -80,6 +78,6 @@ For MarIOnette to send values to the microcontroller, you must keep the MarIOnet
 - Single channel
 - Gif of glowing led from playground
 - Neopixels
-![hi](https://github.com/knee-koh/MarIOnette/tree/main/Media/Gifs/LEDTEST.gif)
+![](Media/Gifs/LEDTEST.gif)
 
 Have Fun!
