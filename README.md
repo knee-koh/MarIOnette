@@ -1,4 +1,4 @@
-![](Media/Photos/LogoV2.png)
+<img src="Media/Photos/LogoTransparent.png" width=100% />
 <p float="left" align="center">
 	<img src="Media/Gifs/SpidahBahtVid.gif" width=45% />
 	<img src="Media/Gifs/DrawBotV2.gif" width=45% />
