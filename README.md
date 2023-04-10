@@ -1,4 +1,4 @@
-![](Media/Photos/LogoV2.png)
+![](./Media/Photos/LogoV2.png)
 
 ## MarIOnette is a Blender plugin for controlling Arduino-based microcontrollers over Serial
 

@@ -1,15 +1,15 @@
 ## Post-Drawing Robot
 
-![GIF](../Media/Gifs/DrawBotV2.gif)
+![GIF](./Media/Gifs/DrawBotV2.gif)
 
 This is an example application of MarIOnette. [Follow along with a video tutorial from here](https://www.youtube.com)
 
 Print out the parts in the STL folder. I used the following settings:
-Material: PLA
-0.20mm Layer Height
-3 Outer Perimeters
-4 Top and Bottom Layers
-25% Gyroid Infill
+- Material: PLA
+- 0.20mm Layer Height
+- 3 Outer Perimeters
+- 4 Top and Bottom Layers
+- 25% Gyroid Infill
 
 ### Parts List:
 | Part  | Amount | Amazon Link |
