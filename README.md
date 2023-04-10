@@ -71,42 +71,20 @@ A more general video describing the interface, mixing motors + LEDs, and gotchas
 For MarIOnette to send values to the microcontroller, you must keep the MarIOnette tab open and visible in your Blender viewport
 
 ### MarIOnette currently supports the following actuators:
-<html>
-<style>
-  /* center everything on the page */
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  /* center the images */
-  .image-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  /* style for the text above the images */
-  h2 {
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-</style>
-
-<body>
-	<h2>Servos</h2>
-	<div class="image-container">
-		  <img src="Media/Gifs/DrawBotV1.gif" width=45%  alt="First Image" />
-	</div>
-	<h2>PWM</h2>
-	<div class="image-container">
-		<img src="Media/Gifs/PiroIrisSmoke.gif" width = 45% alt="Second Image" />
-	</div>
+<body align="center">
+    <h2>Servos</h2>
+    <table>
+      <tr>
+        <td>
+          <img src="Media/Gifs/DrawBotV1.gif" width=45%  />
+        </td>
+        <td>
+          <img src="Media/Gifs/PiroIrisSmoke.gif" width = 45% />
+        </td>
+      </tr>
+    </table>
+    <h2>PWM</h2>
 </body>
-</html>
 
 Servos
 
