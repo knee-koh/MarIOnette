@@ -72,6 +72,7 @@ For MarIOnette to send values to the microcontroller, you must keep the MarIOnet
 
 ### MarIOnette currently supports the following actuators:
 
+<head>
 <style>
   /* center everything on the page */
   body {
@@ -95,6 +96,7 @@ For MarIOnette to send values to the microcontroller, you must keep the MarIOnet
     margin-bottom: 10px;
   }
 </style>
+</head>
 
 <body>
 	<h2>Servos</h2>
@@ -103,7 +105,7 @@ For MarIOnette to send values to the microcontroller, you must keep the MarIOnet
 	</div>
 	<h2>PWM</h2>
 	<div class="image-container">
-		<img src="Media/Gifs/PiroIrisSmoke.gif"  alt="Second Image" />
+		<img src="Media/Gifs/PiroIrisSmoke.gif" width = 45% alt="Second Image" />
 	</div>
 </body>
 
