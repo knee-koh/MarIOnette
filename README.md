@@ -71,15 +71,13 @@ A more general video describing the interface, mixing motors + LEDs, and gotchas
 For MarIOnette to send values to the microcontroller, you must keep the MarIOnette tab open and visible in your Blender viewport
 
 ## MarIOnette currently supports the following actuators:
-<pre>              Servos                            PWM</pre>
+<pre>                              Servos                            PWM</pre>
 <p float="left" align="center">
 	<img src="Media/Gifs/DrawBotV1.gif" width=45% />
 	<img src="Media/Gifs/PiroIrisSmoke.gif" width=45% />
 </p>
 
-<pre>
-<center>ON/OFF(Solenoids)                            Dynamixels and Bus Servos</center>
-</pre>
+<pre>               ON/OFF(Solenoids)                            Dynamixels and Bus Servos</pre>
 <p float="left" align="center">
 	<img src="Media/Gifs/Piro1.gif" width=45% />
 	<img src="Media/Gifs/SpidahBahtVid.gif" width=45% />
