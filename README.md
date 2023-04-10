@@ -1,6 +1,5 @@
 ![](Media/Photos/LogoV2.png)
-<img src="Media/Gifs/SpidahBahtVid.gif" width=50% height=50%>
-<img src="Media/Gifs/DrawBotV2.gif" width=50% height=50%>
+<img src="Media/Gifs/SpidahBahtVid.gif" width=50% height=50%> <img src="Media/Gifs/DrawBotV2.gif" width=50% height=50%>
 
 MarIOnette is a Blender plugin for controlling Arduino-based microcontrollers over Serial
 
