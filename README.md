@@ -71,7 +71,7 @@ A more general video describing the interface, mixing motors + LEDs, and gotchas
 For MarIOnette to send values to the microcontroller, you must keep the MarIOnette tab open and visible in your Blender viewport
 
 ### MarIOnette currently supports the following actuators:
-
+<html>
 <style>
   /* center everything on the page */
   body {
@@ -106,6 +106,7 @@ For MarIOnette to send values to the microcontroller, you must keep the MarIOnet
 		<img src="Media/Gifs/PiroIrisSmoke.gif" width = 45% alt="Second Image" />
 	</div>
 </body>
+</html>
 
 Servos
 
