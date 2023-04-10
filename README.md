@@ -1,9 +1,8 @@
-![](./Media/Photos/LogoV2.png)
-
-## MarIOnette is a Blender plugin for controlling Arduino-based microcontrollers over Serial
-
+![](Media/Photos/LogoV2.png)
 ![](Media/Gifs/SpidahBahtVid.gif)
 ![](Media/Gifs/DrawBotV2.gif)
+
+MarIOnette is a Blender plugin for controlling Arduino-based microcontrollers over Serial
 
 [See it in action here](https://www.youtube.com)
 

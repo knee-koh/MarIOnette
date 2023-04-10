@@ -1,6 +1,7 @@
-## Post-Drawing Robot
+## Post-It Drawing Robot
 
-![GIF](../../Media/Gifs/DrawBotV2.gif)
+<--- ![GIF](../../Media/Gifs/DrawBotV2.gif) -->
+<img src="../../Media/Gifs/DrawBotV2.gif" width=50% height=50%>
 
 This is an example application of MarIOnette. [Follow along with a video tutorial from here](https://www.youtube.com)
 
