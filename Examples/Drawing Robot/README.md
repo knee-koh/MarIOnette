@@ -1,11 +1,15 @@
 ## Post-It Drawing Robot
 
-<--- ![GIF](../../Media/Gifs/DrawBotV2.gif) -->
 <img src="../../Media/Gifs/DrawBotV2.gif" width=50% height=50%>
 
-This is an example application of MarIOnette. [Follow along with a video tutorial from here](https://www.youtube.com)
+This is an example application of MarIOnette. [Follow along with a video tutorial.](https://www.youtube.com)
 
-Print out the parts in the STL folder. I used the following settings:
+To build the robot, you will need to print some parts and order hardware from the provided Amazon links below.
+
+
+Print out the parts in the STL folder. Parts that need to be printed twice will have "(print twice)" in the name. 
+
+I used the following print settings settings:
 - Material: PLA
 - 0.20mm Layer Height
 - 3 Outer Perimeters
@@ -42,3 +46,5 @@ Print out the parts in the STL folder. I used the following settings:
 | M2 x 10mm Screw | 2 | Hex head is ideal |
 | M2 x 8mm Screw | 2 | Hex head is ideal |
 | Post-it notes | 1 | 3 x 5 inch is ideal |
+
+
