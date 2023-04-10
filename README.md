@@ -84,8 +84,7 @@ For MarIOnette to send values to the microcontroller, you must keep the MarIOnet
 </p>
 
 ### And LEDs:
-Neopixels
-
+<pre>                  Neopixels</pre>
 <img src="Media/Gifs/LEDTEST.gif" width=50%>
 
 Support for more actuators and features coming soon...
