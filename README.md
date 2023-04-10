@@ -3,6 +3,7 @@
 ## MarIOnette is a Blender plugin for controlling Arduino-based microcontrollers over Serial
 
 ![](Media/Gifs/SpidahBahtVid.gif)
+![](Media/Gifs/DrawBotV2.gif)
 
 [See it in action here](https://www.youtube.com)
 
