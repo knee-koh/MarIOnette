@@ -1,6 +1,6 @@
 ## Post-Drawing Robot
 
-![GIF](Media/Gifs/DrawBotV2.gif)
+![GIF](../Media/Gifs/DrawBotV2.gif)
 
 This is an example application of MarIOnette. [Follow along with a video tutorial from here](https://www.youtube.com)
 
