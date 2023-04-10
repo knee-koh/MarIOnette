@@ -72,21 +72,18 @@ For MarIOnette to send values to the microcontroller, you must keep the MarIOnet
 
 ## MarIOnette currently supports the following actuators:
 
-                      Servos                      PWM
-
+<center>Servos                            PWM</center>
 <p float="left" align="center">
 	<img src="Media/Gifs/DrawBotV1.gif" width=45% />
 	<img src="Media/Gifs/PiroIrisSmoke.gif" width=45% />
 </p>
 
 
-ON/OFF (Solenoid)
-
-<img src="Media/Gifs/Piro1.gif" width=50%>
-
-Dynamixels and Bus Servos
-
-<img src="Media/Gifs/SpidahBahtVid.gif" width=50%>
+<center>ON/OFF(Solenoids)                            Dynamixels and Bus Servos</center>
+<p float="left" align="center">
+	<img src="Media/Gifs/Piro1.gif" width=45% />
+	<img src="Media/Gifs/SpidahBahtVid.gif" width=45% />
+</p>
 
 ### And LEDs:
 Neopixels
