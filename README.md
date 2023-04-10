@@ -6,13 +6,15 @@
 
 MarIOnette is a Blender plugin for controlling Arduino-based microcontrollers over Serial
 
-[See it in action here](https://www.youtube.com)
+[See it in action here](https://www.youtube.com/watch?v=sCcKe_KH84M)
 
 MarIOnette has been tested on most AVR-Based Arduino-compatible microcontrollers. ARM-Based Teensy microcontrollers have also been verified. Other microcontrollers have not yet been tested.
 
 ### A few examples and templates have been prepared to get you up and running (see the Examples folder)
-[Post-it Drawing Robot](https://www.youtube.com)
-[Playground](https://www.youtube.com)
+[Post-it Drawing Robot](https://www.youtube.com/watch?v=nJkThBeOZog)
+
+A more general video describing the interface, mixing motors + LEDs, and gotchas is coming soon!
+
 
 ### Requirements
 - Blender 3.2 or above
