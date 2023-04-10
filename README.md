@@ -92,6 +92,8 @@ Neopixels
 
 <img src="Media/Gifs/LEDTEST.gif" width=50%>
 
-Support for more actuators coming soon...
+Support for more actuators and features coming soon...
+
+<img src="Media/Gifs/ElmoInput1.gif" width=50%>
 
 Have Fun!
