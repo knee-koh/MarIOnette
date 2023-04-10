@@ -72,7 +72,6 @@ For MarIOnette to send values to the microcontroller, you must keep the MarIOnet
 
 ### MarIOnette currently supports the following actuators:
 
-<head>
 <style>
   /* center everything on the page */
   body {
@@ -96,7 +95,6 @@ For MarIOnette to send values to the microcontroller, you must keep the MarIOnet
     margin-bottom: 10px;
   }
 </style>
-</head>
 
 <body>
 	<h2>Servos</h2>
