@@ -1,5 +1,5 @@
 ![](Media/Photos/LogoV2.png)
-<p float="left" style="text-align:center">
+<p float="left" align="center">
 	<img src="Media/Gifs/SpidahBahtVid.gif" width=45% />
 	<img src="Media/Gifs/DrawBotV2.gif" width=45% />
 </p>
