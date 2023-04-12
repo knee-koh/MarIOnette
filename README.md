@@ -8,7 +8,7 @@ MarIOnette is a Blender plugin for controlling Arduino-based microcontrollers ov
 
 [See it in action here](https://www.youtube.com/watch?v=sCcKe_KH84M)
 
-MarIOnette has been tested on most AVR-Based Arduino-compatible microcontrollers. ARM-Based Teensy microcontrollers (Teensy) have also been verified. Other microcontrollers have not yet been tested.
+MarIOnette has been tested on most AVR-Based Arduino-compatible microcontrollers. ARM-Based microcontrollers (Teensy) have also been verified. Other microcontrollers (like ESP32) have not yet been tested.
 
 ### A few examples and templates have been prepared to get you up and running (see the Examples folder)
 [Post-it Drawing Robot](https://www.youtube.com/watch?v=nJkThBeOZog)
