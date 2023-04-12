@@ -32,7 +32,7 @@ Alternatively, you can switch to indexable LEDs with a dedicated clock pin (APA1
 Support for both of these is coming some time in the future (whenever I get some free time to work on this).
 
 */
-#if TOTAL_LEDS > 0
+#if TOTAL_NEOPIXELS > 0
   #include "PWMServo.h"
 #else
   #include <Servo.h>
@@ -42,10 +42,12 @@ Support for both of these is coming some time in the future (whenever I get some
 //IntervalTimer myTimer;
 
 // Servos
-#if TOTAL_SERVOS > 0 && TOTAL_LEDS > 0
+#if TOTAL_SERVOS > 0 && TOTAL_NEOPIXELS > 0
   PWMServo servos[TOTAL_MOTORS];
-#elif TOTAL_SERVOS > 0 && TOTAL_LEDS == 0
+#elif TOTAL_SERVOS > 0 && TOTAL_NEOPIXELS == 0
   Servo servos[TOTAL_MOTORS];
+#else
+  Servo servos[1];
 #endif
 
 // Steppers
@@ -56,7 +58,7 @@ Support for both of these is coming some time in the future (whenever I get some
 #endif
 
 // Neopixels
-#if TOTAL_LEDS > 0
+#if TOTAL_NEOPIXELS > 0
   Adafruit_NeoPixel neopixels[TOTAL_LEDS];
 #else
   Adafruit_NeoPixel neopixels[1];
@@ -158,12 +160,13 @@ void readSerialBytes(){
             for(int i = 0; i < TOTAL_MOTORS; i++){
               int j = 0;
               if(motor_values[i][0] == 1){
-                if(TOTAL_LEDS > 0){
+                if(TOTAL_NEOPIXELS > 0){
                   servos[i].write(word(tempBuffer[i*2+expectedSpeedBytes], tempBuffer[i*2+expectedSpeedBytes+1]));
                 }
 
                 else{
-                  servos[i].writeMicroseconds(word(tempBuffer[i*2+expectedSpeedBytes], tempBuffer[i*2+expectedSpeedBytes+1]));
+                  //servos[i].writeMicroseconds(word(tempBuffer[i*2+expectedSpeedBytes], tempBuffer[i*2+expectedSpeedBytes+1]));
+                  servos[i].write(word(tempBuffer[i*2+expectedSpeedBytes], tempBuffer[i*2+expectedSpeedBytes+1]));
                 }
               }
 
