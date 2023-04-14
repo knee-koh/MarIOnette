@@ -41,13 +41,22 @@ Support for both of these is coming some time in the future (whenever I get some
 // Interval timer for more precise timing (useful for stepper motors since they need a lot of pulses)
 //IntervalTimer myTimer;
 
-// Servos
+// Servo declarations. If we're using the PWMServo library, writeMicroseconds won't work, so our range is limited from 700 - 2300 to 0 - 180
 #if TOTAL_SERVOS > 0 && TOTAL_NEOPIXELS > 0
   PWMServo servos[TOTAL_MOTORS];
+  void setPosition(int number, int position){
+    servos[number].write(position);
+  }
 #elif TOTAL_SERVOS > 0 && TOTAL_NEOPIXELS == 0
   Servo servos[TOTAL_MOTORS];
+  void setPosition(int number, int position){
+    servos[number].writeMicroseconds(position);
+  }
 #else
   Servo servos[1];
+  void setPosition(int number, int position){
+    servos[number].writeMicroseconds(position);
+  }
 #endif
 
 // Steppers
@@ -64,16 +73,12 @@ Support for both of these is coming some time in the future (whenever I get some
   Adafruit_NeoPixel neopixels[1];
 #endif
 
-
-
 // MarIOnette serial
 unsigned int counter = 0;
 unsigned int howManyBytes = 0;
 
 // Expected packet
 const int expectedMotorBytes = TOTAL_MOTORS * 2;
-const int expectedLEDSingleBytes = TOTAL_LEDS * 4; // RGBW for now
-const int expectedLEDAllBytes = 16 * 4;
 const int expectedSpeedBytes = 2;
 
 // Values
@@ -155,67 +160,97 @@ void readSerialBytes(){
             Serial.println("Success!");
           }
 
+          // Motors first
           if(TOTAL_MOTORS > 0){
+            int servo_index = 0;
+            int stepper_index = 0;
+
             //speed = word(tempBuffer[0], tempBuffer[1]);
             for(int i = 0; i < TOTAL_MOTORS; i++){
-              int j = 0;
+              // Set servo position
+              int offset = i*2+expectedSpeedBytes;
               if(motor_values[i][0] == 1){
-                if(TOTAL_NEOPIXELS > 0){
-                  servos[i].write(word(tempBuffer[i*2+expectedSpeedBytes], tempBuffer[i*2+expectedSpeedBytes+1]));
-                }
-
-                else{
-                  //servos[i].writeMicroseconds(word(tempBuffer[i*2+expectedSpeedBytes], tempBuffer[i*2+expectedSpeedBytes+1]));
-                  servos[i].write(word(tempBuffer[i*2+expectedSpeedBytes], tempBuffer[i*2+expectedSpeedBytes+1]));
-                }
+                setPosition(servo_index, word(tempBuffer[offset], tempBuffer[offset+1]));
+                servo_index++;
               }
 
+              // Set PWM value
               else if(motor_values[i][0] == 2){
-                analogWrite(motor_values[i][1], word(tempBuffer[i*2+expectedSpeedBytes], tempBuffer[i*2+expectedSpeedBytes+1]));
+                analogWrite(motor_values[i][1], word(tempBuffer[offset], tempBuffer[offset+1]));
               }
 
+              // Set stepper position
               else if(motor_values[i][0] == 5){
-                steppers[j].moveTo(word(tempBuffer[i*2+expectedSpeedBytes], tempBuffer[i*2+expectedSpeedBytes+1]));
-                j++;
+                steppers[stepper_index].moveTo(word(tempBuffer[offset], tempBuffer[offset+1]));
+                stepper_index++;
               }
             }
           }
 
+          // Now do LEDs
           if(TOTAL_LEDS > 0){
-            // Update each LED independently
-            if(howManyBytes > expectedSpeedBytes + expectedMotorBytes + expectedLEDSingleBytes){
-              for(int i = 0; i < TOTAL_LEDS; i++){
-                long offset = expectedSpeedBytes + expectedMotorBytes;
+            long offset = expectedSpeedBytes + expectedMotorBytes;
 
-                for(int j = 0; j < led_values[i][2]; j++){
-                  int red = tempBuffer[offset + j*4];
-                  int green = tempBuffer[offset + j*4 + 1];
-                  int blue = tempBuffer[offset + j*4 + 2];
-                  int white = tempBuffer[offset + j*4 + 3];
+            for(int i = 0; i < TOTAL_LEDS; i++){
+              // PWM LED
+              if(led_values[i][0] == 11){
+                analogWrite(led_values[i][1], map(tempBuffer[offset], 0, 254, 0, 1000));
+                offset = offset + 1;
+              }
 
-                  neopixels[i].setPixelColor(j, red, green, blue, white);
+              // Neopixel single color
+              if(led_values[i][0] == 10 && tempBuffer[offset] == 1){
+                offset = offset + 1;
+
+                int red = tempBuffer[offset];
+                int green = tempBuffer[offset + 1];
+                int blue = tempBuffer[offset + 2];
+                int white = 0;
+
+                if(led_values[i][3] >= 5 && led_values[i][3] <= 8){
+                  white = tempBuffer[offset + 3];
+                  offset = offset + 4;
+                }
+
+                else{
+                  offset = offset + 3;
+                }
+
+                for(unsigned int j = 0; j < led_values[i][2]; j++){
+                  if(led_values[i][3] >= 5 && led_values[i][3] <= 8){                    
+                    neopixels[i].setPixelColor(j, red, green, blue, white);
+                  }
+
+                  else{
+                    neopixels[i].setPixelColor(j, red, green, blue);
+                  }
+                }
+                
+                neopixels[i].show();
+              }
+
+              // Individually addressible
+              else{
+                offset = offset + 1;
+                for(unsigned int j = 0; j < led_values[i][2]; j++){
+                  int red = tempBuffer[offset];
+                  int green = tempBuffer[offset + 1];
+                  int blue = tempBuffer[offset + 2];
+
+                  if(led_values[i][3] >= 5 && led_values[i][3] <= 8){
+                    int white = tempBuffer[offset + 3];
+                    neopixels[i].setPixelColor(j, red, green, blue, white);
+                    offset = offset + 4;
+                  }
+
+                  else{
+                    neopixels[i].setPixelColor(j, red, green, blue);
+                    offset = offset + 3;
+                  }
                 }
 
                 neopixels[i].show();
-              }
-            }
-            
-
-            // Otherwise treat LED strip as a single color
-            else{
-              long offset = expectedSpeedBytes + expectedMotorBytes;
-              for(int i = 0; i < TOTAL_LEDS; i++){
-                int red = tempBuffer[offset + i*4];
-                int green = tempBuffer[offset + i*4 + 1];;
-                int blue = tempBuffer[offset + i*4 + 2];;
-                int white = tempBuffer[offset + i*4 + 3];;
-
-                for(int j = 0; j < led_values[i][2]; j++){
-                  neopixels[i].setPixelColor(j, red, green, blue, white);
-                }
-
-                neopixels[i].show();
-              }
+              }            
             }
           }
         }
@@ -225,44 +260,57 @@ void readSerialBytes(){
 }
 
 void setupLEDs(){
-  for(int i = 0; i < TOTAL_LEDS; i++){
-    if(led_values[i][3] == 1){
-      neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_RGB + NEO_KHZ800);
+  if(TOTAL_PWM_LEDS > 0){
+    for(int i = 0; i < TOTAL_LEDS; i++){
+      if(led_values[i][0] == 11){
+        pinMode(led_values[i][2], OUTPUT);
+        analogWrite(led_values[i][2], 0);
+      }
     }
+  }
 
-    else if(led_values[i][3] == 2){
-      neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_GRB + NEO_KHZ800);
+  if(TOTAL_NEOPIXELS > 0){
+    for(int i = 0; i < TOTAL_LEDS; i++){
+      if(led_values[i][0] == 10){
+        if(led_values[i][3] == 1){
+          neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_RGB + NEO_KHZ800);
+        }
+
+        else if(led_values[i][3] == 2){
+          neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_GRB + NEO_KHZ800);
+        }
+
+        else if(led_values[i][3] == 3){
+          neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_RGB + NEO_KHZ400);
+        }
+
+        else if(led_values[i][3] == 4){
+          neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_GRB + NEO_KHZ400);
+        }
+
+        else if(led_values[i][3] == 5){
+          neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_RGBW + NEO_KHZ800);
+        }
+
+        else if(led_values[i][3] == 6){
+          neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_GRBW + NEO_KHZ800);
+        }
+
+        else if(led_values[i][3] == 7){
+          neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_RGBW + NEO_KHZ400);
+        }
+
+        else if(led_values[i][3] == 8){
+          neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_GRBW + NEO_KHZ400);
+        }
+
+        pinMode(led_values[i][1], OUTPUT);
+        neopixels[i].begin();
+        neopixels[i].clear();
+        neopixels[i].show();
+        neopixels[i].setBrightness(30);
+      }
     }
-
-    else if(led_values[i][3] == 3){
-      neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_RGB + NEO_KHZ400);
-    }
-
-    else if(led_values[i][3] == 4){
-      neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_GRB + NEO_KHZ400);
-    }
-
-    else if(led_values[i][3] == 5){
-      neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_RGBW + NEO_KHZ800);
-    }
-
-    else if(led_values[i][3] == 6){
-      neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_GRBW + NEO_KHZ800);
-    }
-
-    else if(led_values[i][3] == 7){
-      neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_RGBW + NEO_KHZ400);
-    }
-
-    else if(led_values[i][3] == 8){
-      neopixels[i] = Adafruit_NeoPixel(led_values[i][2], led_values[i][1], NEO_GRBW + NEO_KHZ400);
-    }
-
-    pinMode(led_values[i][1], OUTPUT);
-    neopixels[i].begin();
-    neopixels[i].clear();
-    neopixels[i].show();
-    neopixels[i].setBrightness(30);
   }
 }
 
@@ -320,7 +368,7 @@ void setup() {
     Serial.println("Servo init done");
   }
 
-  // Neopixel
+  // LED Setup
   if(TOTAL_LEDS > 0){
     setupLEDs();
     Serial.println("Neopixel ring init done");
