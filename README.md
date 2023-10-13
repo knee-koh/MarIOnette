@@ -21,8 +21,8 @@ A more general video describing the interface, mixing motors + LEDs, and gotchas
 - Arduino 2.0 (Earlier versions have also been tested to work)
     - Install the following libraries for Arduino:
         - AccelStepper
-        -  PWMServo
-        -  Adaftui_Neopixel
+        - PWMServo
+        - Adafruit_Neopixel
 
 ### Installation on Mac
 1. Download the Marionette.zip file from the Blender Plugin folder

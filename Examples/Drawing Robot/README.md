@@ -29,7 +29,7 @@ I used the following print settings settings:
 | 27mm OD x 20mm ID x 4mm Thick Bearing | 1 | [Link](https://www.amazon.com/uxcell-6704-2RS-Groove-Bearings-Double/dp/B082PS5HHN/ref=sr_1_3?crid=FFEIMJE6NMIG&keywords=20x27x4+bearing&qid=1680816886&sprefix=20x27x4+bearin%2Caps%2C136&sr=8-3) |
 | Post-it notes | 1 | [Link](https://www.amazon.com/Post-Americas-Collection-Recyclable-655-5PK/dp/B00006JNNG/ref=sr_1_6?keywords=3+x+5+post+it+notes&qid=1680817217&sprefix=3+x+5+post%2Caps%2C197&sr=8-6) |
 
-### Here is the exact amount of hardware required in case you want to order individual items:
+### Here is an itemized list of hardware required in case you want to order from other sources:
 | Part  | Amount | Notes |
 | ------------- | ------------- | ------------- |
 | Arduino Nano | 1 | Any Arduino-compatible microcontroller should work | 
