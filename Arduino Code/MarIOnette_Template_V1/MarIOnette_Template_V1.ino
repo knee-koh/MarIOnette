@@ -164,7 +164,8 @@ void setup() {
   
   Serial.println("Setup finished!");
 
-  // Test SD card animation playback
+  /*
+  // Uncomment this block to test SD card animation playback 
   // Change the testFile name to whatever you exported the animation as, and then trigger it to run
   if(DEBUG_SD_PLAYBACK_TEST){
     String testFile = "test8";
@@ -173,6 +174,7 @@ void setup() {
     playingAnimation = 1;
     readAnimationFile();
   }
+  */
 }
 
 void loop() {
