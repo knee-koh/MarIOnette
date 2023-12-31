@@ -22,7 +22,7 @@ A more general video describing the interface, mixing motors + LEDs, and gotchas
     - Install the following libraries for Arduino:
         - AccelStepper
         - PWMServo
-        - Adafruit_Neopixel
+        - FastLED
         - Dynamixel2Arduino
 
 ### Installation on Mac
