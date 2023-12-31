@@ -73,7 +73,7 @@ For MarIOnette to send values to the microcontroller, you must keep the MarIOnet
 
 Dynamixels and Bus Servos have only been tested on Teensy microcontrollers. Because MarIOnette uses the main Serial port on the microcontroller, another serial port (Serial1, Serial2, etc.) is used to communicate with the Dynamixels or Bus Servos. If you want to use MarIOnette on an Arduino Uno (or other microcontroller with only one Serial Port), you will have to modify the Arduino code to use the SoftwareSerial library. Please look at the examples in the Dynamixel2Arduino library for guidance.
 
-Dynamixels and Bus Servos need an additional board to convert the RX and TX lines to a TTL Half-Duplex single wire. LewanSoul and Dynamixel should have these boards available on their websites/Amazon. You can also create your own board for the Dynamixel by following their wiring diagram. I have a prototype PCB working, and will link to the .gerber files in the upcoming weeks.
+Dynamixels and Bus Servos need an additional board to convert the RX and TX lines to a TTL Half-Duplex single wire. LewanSoul and Dynamixel should have these boards available on their websites/Amazon. You can also create your own board for the Dynamixel by following their wiring diagram. (I have a prototype PCB working for Dynamixel modules)[https://github.com/knee-koh/UARTtoTTL], though it can definitely be made smaller with other components.
 
 ## MarIOnette currently supports the following actuators:
 <pre>                      Servos                                          PWM</pre>
