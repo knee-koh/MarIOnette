@@ -69,17 +69,23 @@ A more general video describing the interface, mixing motors + LEDs, and gotchas
 
 
 ### IMPORTANT
-For MarIOnette to send values to the microcontroller, you must keep the MarIOnette tab open and visible in your Blender viewport
+- Make sure you are using a good quality data + power USB cable to connect to your microcontroller.
 
-Before connecting to your microcontroller, make sure to go through all your actuators and LEDs and double check the correct Armature, bone, and axis settings are set for each one. This is especially important when importing an older file into a newer version of the MarIOnette Blender addon.
+- For MarIOnette to send values to the microcontroller, you must keep the MarIOnette tab open and visible in your Blender viewport.
 
-A known issue that is being currently worked on involves neopixel strips or arrays when set to indexed mode (this relies on the Blender geometry nodes system). If you have a neopixel strip and other LED objects, make sure to select the Neopixel object by highlighting it in the MarIOnette panel in order to send the value of each LED. This is a known bug that is being addressed in upcoming releases.
+- Before connecting to your microcontroller, make sure to go through all your actuators and LEDs and double check the correct Armature, bone, and axis settings are set for each one. This is especially important when importing an older file into a newer version of the MarIOnette Blender addon.
 
-When naming a file for export to an SD card, [use 8 or fewer characters](https://www.arduino.cc/reference/en/libraries/sd/) and no extension. Also be sure to check the "Write cache header line" box so the microcontroller will know what fps to play the animation back at.
+- When using Neopixels and Servo motors together, the resolution of the servo motor is limited to 0-180. This is due to the Neopixel library disbling interrupts, which the Servo library relies on using. MarIOnette will detect this and change the library for the Servo to PWMServo, which causes the aforementioned resolution limit. If you need higher resolution output to your servos and indexed leds, you can do the following:
+    - Use Dotstars, APA102, or SK9822 leds. These use a data and clock line, and do not disable interrupts so the original Servo library can be used.
+    - Use bus servos instead of normal servos.
+    - Use an expansion board that connects with your microcontroller through I2C or SPI, but this will require you to modify the Arduino code to include other libraries.
 
-Dynamixels and Bus Servos have only been tested on Teensy microcontrollers. Because MarIOnette uses the main Serial port on the microcontroller, another serial port (Serial1, Serial2, etc.) is used to communicate with the Dynamixels or Bus Servos. If you want to use MarIOnette on an Arduino Uno (or other microcontroller with only one Serial Port), you will have to modify the Arduino code to use the SoftwareSerial library. Please look at the examples in the Dynamixel2Arduino library for guidance.
+- A known issue that is being currently worked on involves neopixel strips or arrays when set to indexed mode (this relies on the Blender geometry nodes system). If you have a neopixel strip and other LED objects, make sure to select the Neopixel object by highlighting it in the MarIOnette panel in order to send the value of each LED. This is a known bug that is being addressed in upcoming releases.
 
-Dynamixels and Bus Servos need an additional board to convert the RX and TX lines to a TTL Half-Duplex single wire. LewanSoul and Dynamixel should have these boards available on their websites/Amazon. You can also create your own board for the Dynamixel by following their wiring diagram. [I have a prototype PCB working for Dynamixel modules](https://github.com/knee-koh/UARTtoTTL), though it can definitely be made smaller with other components.
+- When naming a file for export to an SD card, [use 8 or fewer characters](https://www.arduino.cc/reference/en/libraries/sd/) and no extension. Also be sure to check the "Write cache header line" box so the microcontroller will know what fps to play the animation back at.
+
+- Dynamixels and Bus Servos have only been tested on Teensy microcontrollers. Because MarIOnette uses the main Serial port on the microcontroller, another serial port (Serial1, Serial2, etc.) is used to communicate with the Dynamixels or Bus Servos. If you want to use MarIOnette on an Arduino Uno (or other microcontroller with only one Serial Port), you will have to modify the Arduino code to use the SoftwareSerial library. Please look at the examples in the Dynamixel2Arduino library for guidance.
+    - Dynamixels and Bus Servos need an additional board to convert the RX and TX lines to a TTL Half-Duplex single wire. LewanSoul and Dynamixel should have these boards available on their websites/Amazon. You can also create your own board for the Dynamixel by following their wiring diagram. [I have a prototype PCB working for Dynamixel modules](https://github.com/knee-koh/UARTtoTTL), though it can definitely be made smaller with other components.
 
 ## MarIOnette currently supports the following actuators:
 <pre>                      Servos                                          PWM</pre>
