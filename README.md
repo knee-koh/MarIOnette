@@ -17,8 +17,8 @@ A more general video describing the interface, mixing motors + LEDs, and gotchas
 
 
 ### Requirements
-- Blender 3.0 or above
-- Arduino 2.0 (Earlier versions have also been tested to work)
+- [Blender 3.0 or above](https://www.blender.org/)
+- [Arduino 2.0](https://www.arduino.cc/en/software) (Earlier versions have also been tested to work)
     - Install the following libraries for Arduino:
         - AccelStepper
         - PWMServo
@@ -75,10 +75,10 @@ A more general video describing the interface, mixing motors + LEDs, and gotchas
 
 - Before connecting to your microcontroller, make sure to go through all your actuators and LEDs and double check the correct Armature, bone, and axis settings are set for each one. This is especially important when importing an older file into a newer version of the MarIOnette Blender addon.
 
-- When using Neopixels and Servo motors together, the resolution of the servo motor is limited to 0-180. This is due to the Neopixel library disbling interrupts, which the Servo library relies on using. MarIOnette will detect this and change the library for the Servo to PWMServo, which causes the aforementioned resolution limit. If you need higher resolution output to your servos and indexed leds, you can do the following:
+- When using Neopixels and Servo motors together, the resolution of the servo motor is limited to 0-180. This is due to the [Neopixel library disbling interrupts](https://forum.arduino.cc/t/adafruit_neopixel-and-servo-h/689191), which the Servo library relies on using. MarIOnette will detect this and change the library for the Servo to PWMServo, which causes the aforementioned resolution limit. If you need higher resolution output to your servos and indexed leds, you can do the following:
     - Use Dotstars, APA102, or SK9822 leds. These use a data and clock line, and do not disable interrupts so the original Servo library can be used.
     - Use bus servos instead of normal servos.
-    - Use an expansion board that connects with your microcontroller through I2C or SPI, but this will require you to modify the Arduino code to include other libraries.
+    - [Use an expansion board](https://www.adafruit.com/product/815?gad_source=1) that connects with your microcontroller through I2C or SPI, but this will require you to modify the Arduino code to include other libraries.
 
 - A known issue that is being currently worked on involves neopixel strips or arrays when set to indexed mode (this relies on the Blender geometry nodes system). If you have a neopixel strip and other LED objects, make sure to select the Neopixel object by highlighting it in the MarIOnette panel in order to send the value of each LED. This is a known bug that is being addressed in upcoming releases.
 
@@ -101,7 +101,7 @@ A more general video describing the interface, mixing motors + LEDs, and gotchas
 </p>
 
 ### And LEDs:
-<pre>                  Neopixels                                       Dotsars</pre>
+<pre>                    Neopixels                                         Dotsars</pre>
 <p float="left" align="center">
     <img src="Media/Gifs/LEDTEST.gif" width=45%>
     <img src="Media/Gifs/DOTSTARTEST.gif" width=45%>
