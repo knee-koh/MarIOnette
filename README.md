@@ -17,7 +17,7 @@ A more general video describing the interface, mixing motors + LEDs, and gotchas
 
 
 ### Requirements
-- [Blender 3.0 or above](https://www.blender.org/)
+- [Blender 3.0 or above](https://www.blender.org/download/)
 - [Arduino 2.0](https://www.arduino.cc/en/software) (Earlier versions have also been tested to work)
     - Install the following libraries for Arduino:
         - AccelStepper
