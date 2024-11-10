@@ -26,7 +26,7 @@ A more general video describing the interface, mixing motors + LEDs, and gotchas
         - Dynamixel2Arduino
 
 ### Installation on Mac
-1. Download the Marionette.zip file from the Blender Plugin folder
+1. Download the Marionette.zip file from the Blender Plugin folder (<ins>for Blender version 4.2 or higher; for older versions of blender please download MarIOnette release 1.0.4 or older </ins>).
 2. Open Blender
 3. Go to edit > preferences
 4. Select "Add Ons"
@@ -36,7 +36,7 @@ A more general video describing the interface, mixing motors + LEDs, and gotchas
 8. To view MarIOnette, press 'N' to bring up the side bar
 
 ### Installation on Windows
-1. Download the Marionette.zip file from the Blender Plugin folder
+1. Download the Marionette.zip file from the Blender Plugin folder (<ins>for Blender version 4.2 or higher; for older versions of blender please download MarIOnette release 1.0.4 or older </ins>).
 2. (IMPORTANT) Open Blender as Administrator
 3. Go to edit > preferences
 4. Select "Add Ons"
