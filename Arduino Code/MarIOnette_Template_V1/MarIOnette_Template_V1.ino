@@ -8,7 +8,8 @@ Tested on Arduino Nano (ATMega 328P), Arduino Uno, Teensy 3.2, Teensy 3.6, and T
 
 #define DEBUG_SETUP 1
 #define DEBUG_SERIAL 0
-#define DEBUG_SD_PLAYBACK_TEST 0
+#define DEBUG_SD_PLAYBACK_TEST 1
+#define DEBUG_MEMORY_PLAYBACK_TEST 1
 
 #include "config.h"
 
@@ -175,13 +176,30 @@ void setup() {
     readAnimationFile();
   }
   */
+
+  /*
+  // Uncomment this block to test local animation playback 
+  // Change the "animation1" name to whatever you exported the animation as, and then trigger it to run
+  // Confirm there are animations available in the animations.h file
+  if(DEBUG_MEMORY_PLAYBACK_TEST){
+    globalArrayPointer = &Anim1;
+    animationArrayPointer = (unsigned char*)Anim1[3];
+    readAnimationFileMemory();
+  }
+  */
 }
 
 void loop() {
   // Begin reading serial port for incoming commands
   readSerialBytes();
   if(playingAnimation){
-    playAnimationFile();
+    if(!isMemoryAnimation){
+      playAnimationFile();
+    }
+
+    else{
+      playAnimationMemory();
+    }
   }
   updateSteppers();
 }
