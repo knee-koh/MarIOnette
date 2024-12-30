@@ -23,7 +23,7 @@ MarIOnette has been tested on most AVR-Based Arduino-compatible microcontrollers
         - Dynamixel2Arduino
 
 ### Installation on Mac
-1. Download the Marionette.zip file from the Blender Plugin folder (<ins>for Blender version 4.2 or higher; for older versions of blender please download MarIOnette release 1.0.4 or older </ins>).
+1. Download the Marionette.zip file from the Blender Plugin folder, there are two versions depending on which Blender version you have.
 2. Open Blender
 3. Go to edit > preferences
 4. Select "Get Extensions" or Add-ons"
@@ -32,7 +32,7 @@ MarIOnette has been tested on most AVR-Based Arduino-compatible microcontrollers
 7. To view MarIOnette, press 'N' to bring up the side bar
 
 ### Installation on Windows
-1. Download the Marionette.zip file from the Blender Plugin folder (<ins>for Blender version 4.2 or higher; for older versions of blender please download MarIOnette release 1.0.4 or older </ins>).
+1. Download the Marionette.zip file from the Blender Plugin folder, there are two versions depending on which Blender version you have.
 2. <ins>(IMPORTANT)</ins> Open Blender as Administrator
 3. Go to edit > preferences
 4. Select "Get Extensions" or Add-ons"
