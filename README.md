@@ -8,7 +8,7 @@ MarIOnette is a Blender plugin for controlling Arduino-based microcontrollers ov
 
 [See it in action here](https://www.youtube.com/watch?v=sCcKe_KH84M)
 
-MarIOnette has been tested on most AVR-Based Arduino-compatible microcontrollers. ARM-Based microcontrollers (Teensy) have also been verified. Other microcontrollers (like ESP32) have not yet been tested.
+MarIOnette has been tested on most AVR-Based Arduino-compatible microcontrollers. This includes Teensy and ESP32 microcontrollers as well.
 
 ### A few examples and templates have been prepared to get you up and running (see the Examples folder)
 [Post-it Drawing Robot](https://www.youtube.com/watch?v=nJkThBeOZog)
@@ -33,7 +33,7 @@ MarIOnette has been tested on most AVR-Based Arduino-compatible microcontrollers
 
 ### Installation on Windows
 1. Download the Marionette.zip file from the Blender Plugin folder, there are two versions depending on which Blender version you have.
-2. <ins>(IMPORTANT)</ins> Open Blender as Administrator
+2. **<ins>(IMPORTANT)</ins>** Open Blender as Administrator
 3. Go to edit > preferences
 4. Select "Get Extensions" or Add-ons"
 5. Click on the down arrow in the top right of the Preferences window, then "Install from Disk"
